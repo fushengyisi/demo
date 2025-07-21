@@ -1,0 +1,85 @@
+import numpy as np
+from scipy.optimize import least_squares
+
+
+# 定义x坐标对应的函数
+def func_x(t, Ax, wx, phix, Bx, lambdax):
+    return Ax * np.sin(wx * t + phix) + Bx * np.exp(-lambdax * t)
+
+
+# 定义y坐标对应的函数
+def func_y(t, Ay, wy, phiy, By, lambday):
+    return Ay * np.sin(wy * t + phiy) + By * np.exp(-lambday * t)
+
+
+# 定义z坐标对应的函数
+def func_z(t, Az, wz, phiz, Bz, lambdaz):
+    return Az * np.sin(wz * t + phiz) + Bz * np.exp(-lambdaz * t)
+
+
+# 定义残差函数，计算x坐标观测值与模型预测值的差值
+def residuals_x(params, t, x_obs):
+    Ax, wx, phix, Bx, lambdax = params
+    x_pred = func_x(t, Ax, wx, phix, Bx, lambdax)
+    return x_obs - x_pred
+
+
+# 定义残差函数，计算y坐标观测值与模型预测值的差值
+def residuals_y(params, t, y_obs):
+    Ay, wy, phiy, By, lambday = params
+    y_pred = func_y(t, Ay, wy, phiy, By, lambday)
+    return y_obs - y_pred
+
+
+# 定义残差函数，计算z坐标观测值与模型预测值的差值
+def residuals_z(params, t, z_obs):
+    Az, wz, phiz, Bz, lambdaz = params
+    z_pred = func_z(t, Az, wz, phiz, Bz, lambdaz)
+    return z_obs - z_pred
+
+
+# 计算决定系数 R^2 的函数
+def calculate_r2(obs, pred):
+    ss_res = np.sum((obs - pred) ** 2)
+    ss_tot = np.sum((obs - np.mean(obs)) ** 2)
+    return 1 - (ss_res / ss_tot)
+
+
+# 假设已有时间t和对应的x, y, z坐标数据
+# 这里只是模拟数据，你需要替换成真实数据
+t_data = np.array([1, 2, 3, 4, 5])
+x_data = np.array([1.2, 3.5, 6.7, 9.8, 12.3])
+y_data = np.array([2.1, 4.6, 7.8, 10.2, 13.1])
+z_data = np.array([0.8, 2.9, 5.6, 8.3, 11.0])
+
+# 参数初始猜测值
+initial_params_x = np.array([1, 1, 0, 1, 0.1])
+initial_params_y = np.array([1, 1, 0, 1, 0.1])
+initial_params_z = np.array([1, 1, 0, 1, 0.1])
+
+# 拟合x坐标对应的参数
+result_x = least_squares(residuals_x, initial_params_x, args=(t_data, x_data))
+fitted_params_x = result_x.x
+x_pred = func_x(t_data, *fitted_params_x)
+r2_x = calculate_r2(x_data, x_pred)
+print("拟合x坐标对应的参数:", fitted_params_x)
+print("x坐标拟合的R^2:", r2_x)
+
+# 拟合y坐标对应的参数
+result_y = least_squares(residuals_y, initial_params_y, args=(t_data, y_data))
+fitted_params_y = result_y.x
+y_pred = func_y(t_data, *fitted_params_y)
+r2_y = calculate_r2(y_data, y_pred)
+print("拟合y坐标对应的参数:", fitted_params_y)
+print("y坐标拟合的R^2:", r2_y)
+
+# 拟合z坐标对应的参数
+result_z = least_squares(residuals_z, initial_params_z, args=(t_data, z_data))
+fitted_params_z = result_z.x
+z_pred = func_z(t_data, *fitted_params_z)
+r2_z = calculate_r2(z_data, z_pred)
+print("拟合z坐标对应的参数:", fitted_params_z)
+print("z坐标拟合的R^2:", r2_z)
+
+#当 x、y、z 坐标拟合的决定系数都为 1 时，说明这次的拟合结果是非常理想的
+#换句话说这次结果是代入计算得到的

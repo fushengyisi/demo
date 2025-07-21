@@ -1,0 +1,87 @@
+import numpy as np
+from scipy.optimize import least_squares
+
+# 定义 x 坐标对应的函数
+def func_x(t, Cx, wx0, kx, Dx):
+    return Cx * np.sin(wx0 + kx * t) + Dx
+
+# 定义 y 坐标对应的函数
+def func_y(t, Cy, wy0, ky, Dy):
+    return Cy * np.sin(wy0 + ky * t) + Dy
+
+# 定义 z 坐标对应的函数
+def func_z(t, Cz, wz0, kz, Dz):
+    return Cz * np.sin(wz0 + kz * t) + Dz
+
+# 定义 x 坐标的残差函数
+def residuals_x(params, t, x_obs):
+    Cx, wx0, kx, Dx = params
+    x_pred = func_x(t, Cx, wx0, kx, Dx)
+    return x_obs - x_pred
+
+# 定义 y 坐标的残差函数
+def residuals_y(params, t, y_obs):
+    Cy, wy0, ky, Dy = params
+    y_pred = func_y(t, Cy, wy0, ky, Dy)
+    return y_obs - y_pred
+
+# 定义 z 坐标的残差函数
+def residuals_z(params, t, z_obs):
+    Cz, wz0, kz, Dz = params
+    z_pred = func_z(t, Cz, wz0, kz, Dz)
+    return z_obs - z_pred
+
+# 计算 RMSE 的函数
+def calculate_rmse(obs, pred):
+    return np.sqrt(np.mean((obs - pred) ** 2))
+
+# 计算决定系数 R^2 的函数
+def calculate_r2(obs, pred):
+    ss_res = np.sum((obs - pred) ** 2)
+    ss_tot = np.sum((obs - np.mean(obs)) ** 2)
+    return 1 - (ss_res / ss_tot)
+
+# 假设已有时间 t 和对应的 x, y, z 坐标数据
+# 这里只是模拟数据，你需要替换成真实数据
+t_data = np.array([1, 2, 3, 4, 5])
+x_data = np.array([1.2, 3.5, 6.7, 9.8, 12.3])
+y_data = np.array([2.1, 4.6, 7.8, 10.2, 13.1])
+z_data = np.array([0.8, 2.9, 5.6, 8.3, 11.0])
+
+# 参数初始猜测值
+initial_params_x = np.array([1, 0, 1, 1])
+initial_params_y = np.array([1, 0, 1, 1])
+initial_params_z = np.array([1, 0, 1, 1])
+
+# 拟合 x 坐标对应的参数
+result_x = least_squares(residuals_x, initial_params_x, args=(t_data, x_data))
+fitted_params_x = result_x.x
+x_pred = func_x(t_data, *fitted_params_x)
+rmse_x = calculate_rmse(x_data, x_pred)
+r2_x = calculate_r2(x_data, x_pred)
+print("拟合 x 坐标对应的参数:", fitted_params_x)
+print("x 坐标拟合的 RMSE:", rmse_x)
+print("x 坐标拟合的 R^2:", r2_x)
+
+# 拟合 y 坐标对应的参数
+result_y = least_squares(residuals_y, initial_params_y, args=(t_data, y_data))
+fitted_params_y = result_y.x
+y_pred = func_y(t_data, *fitted_params_y)
+rmse_y = calculate_rmse(y_data, y_pred)
+r2_y = calculate_r2(y_data, y_pred)
+print("拟合 y 坐标对应的参数:", fitted_params_y)
+print("y 坐标拟合的 RMSE:", rmse_y)
+print("y 坐标拟合的 R^2:", r2_y)
+
+# 拟合 z 坐标对应的参数
+result_z = least_squares(residuals_z, initial_params_z, args=(t_data, z_data))
+fitted_params_z = result_z.x
+z_pred = func_z(t_data, *fitted_params_z)
+rmse_z = calculate_rmse(z_data, z_pred)
+r2_z = calculate_r2(z_data, z_pred)
+print("拟合 z 坐标对应的参数:", fitted_params_z)
+print("z 坐标拟合的 RMSE:", rmse_z)
+print("z 坐标拟合的 R^2:", r2_z)
+
+#决定系数R^2用于衡量回归模型对观测数据的拟合优度，其值越接近 1，
+# 表示模型对数据的拟合效果越好，能解释的数据变异性比例越高；越接近 0

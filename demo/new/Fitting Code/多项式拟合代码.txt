@@ -1,0 +1,54 @@
+import numpy as np
+from scipy.optimize import least_squares
+
+# 定义三次多项式函数
+def cubic_poly(t, a0, a1, a2, a3):
+    return a0 + a1 * t + a2 * t ** 2 + a3 * t ** 3
+
+# 定义残差函数，计算观测值与模型预测值的差值
+def residuals(params, t, obs):
+    a0, a1, a2, a3 = params
+    pred = cubic_poly(t, a0, a1, a2, a3)
+    return obs - pred
+
+# 计算决定系数 R^2 的函数
+def calculate_r2(obs, pred):
+    ss_res = np.sum((obs - pred) ** 2)
+    ss_tot = np.sum((obs - np.mean(obs)) ** 2)
+    return 1 - (ss_res / ss_tot)
+
+# 假设已有时间 t 和对应的 x, y, z 坐标数据
+# 这里只是模拟数据，你需要替换成真实数据
+t_data = np.array([1, 2, 3, 4, 5])
+x_data = np.array([1.2, 3.5, 6.7, 9.8, 12.3])
+y_data = np.array([2.1, 4.6, 7.8, 10.2, 13.1])
+z_data = np.array([0.8, 2.9, 5.6, 8.3, 11.0])
+
+# 参数初始猜测值
+initial_params = np.array([0, 0, 0, 0])
+
+# 拟合 x 坐标对应的参数
+result_x = least_squares(residuals, initial_params, args=(t_data, x_data))
+fitted_params_x = result_x.x
+x_pred = cubic_poly(t_data, *fitted_params_x)
+r2_x = calculate_r2(x_data, x_pred)
+print("拟合 x 坐标对应的参数:", fitted_params_x)
+print("x 坐标拟合的 R^2:", r2_x)
+
+# 拟合 y 坐标对应的参数
+result_y = least_squares(residuals, initial_params, args=(t_data, y_data))
+fitted_params_y = result_y.x
+y_pred = cubic_poly(t_data, *fitted_params_y)
+r2_y = calculate_r2(y_data, y_pred)
+print("拟合 y 坐标对应的参数:", fitted_params_y)
+print("y 坐标拟合的 R^2:", r2_y)
+
+# 拟合 z 坐标对应的参数
+result_z = least_squares(residuals, initial_params, args=(t_data, z_data))
+fitted_params_z = result_z.x
+z_pred = cubic_poly(t_data, *fitted_params_z)
+r2_z = calculate_r2(z_data, z_pred)
+print("拟合 z 坐标对应的参数:", fitted_params_z)
+print("z 坐标拟合的 R^2:", r2_z)
+
+#R^2越接近1表明拟合的程度就越好

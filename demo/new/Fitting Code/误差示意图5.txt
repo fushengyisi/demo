@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 生成示例数据
+x = np.linspace(0, 10, 100)  # 自变量 x
+
+# 生成三组不同的函数值作为示例的真实值
+y1 = np.sin(x)
+y2 = np.cos(x)
+y3 = 0.5 * np.sin(2 * x)
+
+# 生成三组对应的误差值（这里简单使用随机数模拟）
+error1 = 0.1 * np.random.randn(len(x))
+error2 = 0.15 * np.random.randn(len(x))
+error3 = 0.2 * np.random.randn(len(x))
+
+# 设置图片清晰度
+plt.rcParams['figure.dpi'] = 300
+
+# 绘制多线条误差分析图
+plt.figure(figsize=(10, 6))
+
+# 绘制第一组数据及其误差范围
+plt.errorbar(x, y1, yerr=abs(error1), fmt='-o', color='blue', label='Function 1', capsize=3, elinewidth=1, markersize=3)
+
+# 绘制第二组数据及其误差范围
+plt.errorbar(x, y2, yerr=abs(error2), fmt='-s', color='red', label='Function 2', capsize=3, elinewidth=1, markersize=3)
+
+# 绘制第三组数据及其误差范围
+plt.errorbar(x, y3, yerr=abs(error3), fmt='-^', color='green', label='Function 3', capsize=3, elinewidth=1, markersize=3)
+
+# 添加图例、标题和坐标轴标签
+plt.legend()
+plt.title('Multi-line Error Analysis Plot')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+
+# 显示网格
+plt.grid(True)
+
+# 显示图形
+plt.show()

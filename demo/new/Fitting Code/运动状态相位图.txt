@@ -1,0 +1,20 @@
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import numpy as np
+# 生成螺旋上升轨迹
+# 生成阻尼振动数据
+t = np.linspace(0, 10, 200)
+pos = np.exp(-0.2*t) * np.sin(3*t)
+vel = np.gradient(pos, t)
+
+plt.figure(figsize=(10, 6))
+plt.plot(pos, vel, 'm-', linewidth=1.5)
+plt.scatter(pos[::10], vel[::10], c=t[::10],
+           cmap='viridis', s=50, edgecolors='k')
+
+plt.colorbar(label='Time (s)')
+plt.xlabel('Position (m)')
+plt.ylabel('Velocity (m/s)')
+plt.title('Phase Portrait: Position vs Velocity')
+plt.grid(True)
+plt.show()

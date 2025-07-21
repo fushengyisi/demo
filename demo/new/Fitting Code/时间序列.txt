@@ -1,0 +1,28 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 生成模拟数据
+t = np.linspace(0, 10, 100)
+pos = 2 * t**2 - 0.1 * t**3  # 位置函数
+vel = 4*t - 0.3*t**2         # 速度（位置的一阶导数）
+acc = 4 - 0.6*t              # 加速度（二阶导数）
+
+plt.figure(figsize=(12, 8))
+plt.subplot(3,1,1)
+plt.plot(t, pos, 'b-', linewidth=2)
+plt.title('Position-Time Curve')
+plt.ylabel('Position (m)')
+
+plt.subplot(3,1,2)
+plt.plot(t, vel, 'g--', linewidth=2)
+plt.title('Velocity-Time Curve')
+plt.ylabel('Velocity (m/s)')
+
+plt.subplot(3,1,3)
+plt.plot(t, acc, 'r:', linewidth=2)
+plt.title('Acceleration-Time Curve')
+plt.xlabel('Time (s)')
+plt.ylabel('Acceleration (m/s²)')
+
+plt.tight_layout()
+plt.show()

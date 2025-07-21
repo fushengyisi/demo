@@ -1,0 +1,55 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score, mean_squared_error
+
+# 生成带噪声的线性数据
+np.random.seed(42)
+x = np.linspace(0, 10, 50)
+y_true = 2.5 * x + 1.0
+y_obs = y_true + np.random.normal(0, 3, x.shape)
+
+# 最小二乘法拟合（一阶多项式）
+coefficients = np.polyfit(x, y_obs, 1)
+y_fit = np.polyval(coefficients, x)
+
+# 计算统计量
+r2 = r2_score(y_obs, y_fit)
+rmse = np.sqrt(mean_squared_error(y_obs, y_fit))
+equation = f"y = {coefficients[0]:.2f}x + {coefficients[1]:.2f}"
+stats_text = f"$R^2$ = {r2:.2f}\nRMSE = {rmse:.2f}"
+
+plt.figure(figsize=(8, 6), dpi=300)
+plt.scatter(x, y_obs, color='blue', label='Observed Data', alpha=0.7, edgecolor='k')
+plt.plot(x, y_fit, color='red', linewidth=2, label='Least Squares Fit')
+plt.xlabel('Independent Variable (x)', fontsize=12)
+plt.ylabel('Dependent Variable (y)', fontsize=12)
+plt.title('Least Squares Fit with Residuals', fontsize=14)
+plt.grid(linestyle='--', alpha=0.5)
+
+# 绘制残差线（从数据点到拟合线）
+for xi, yi, yf in zip(x, y_obs, y_fit):
+    plt.plot([xi, xi], [yi, yf], color='gray', linestyle=':', alpha=0.5)
+
+plt.text(0.5, 0.15, equation + '\n' + stats_text,
+         transform=plt.gca().transAxes,  # 使用相对坐标定位
+         fontsize=12, bbox=dict(facecolor='white', alpha=0.8, edgecolor='none'))
+plt.legend(loc='upper left', frameon=True)
+
+from scipy import stats
+
+# 计算置信区间（95%）
+n = len(x)
+m = len(coefficients)
+dof = n - m
+t = stats.t.ppf(0.975, dof)
+residual = y_obs - y_fit
+s_err = np.sqrt(np.sum(residual**2) / dof)
+x_mean = np.mean(x)
+x_var = np.sum((x - x_mean)**2)
+ci = t * s_err * np.sqrt(1/n + (x - x_mean)**2 / x_var)
+
+plt.fill_between(x, y_fit - ci, y_fit + ci, color='red', alpha=0.1, label='95% CI')
+
+plt.tight_layout()
+plt.savefig('least_squares_fit.png', bbox_inches='tight', transparent=False)
+plt.show()

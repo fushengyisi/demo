@@ -1,0 +1,56 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+from sklearn.metrics import r2_score
+import math
+
+
+# 定义正弦函数模型
+def sin_model(x, A, omega, phi, B):
+    return A * np.sin(omega * x + phi) + B
+
+
+# 生成模拟的正弦数据
+np.random.seed(0)
+x_data = np.linspace(0, 10, 50)
+y_data = 3 * np.sin(2 * x_data + 0.5) + 2 + np.random.normal(0, 0.5, 50)
+
+# 初始参数猜测
+p0 = [1, 1, 0, 1]
+
+# 使用curve_fit进行非线性最小二乘法拟合
+popt, pcov = curve_fit(sin_model, x_data, y_data, p0=p0)
+
+# 预测值
+y_fit = sin_model(x_data, *popt)
+
+# 计算残差
+residuals = y_data - y_fit
+
+# 计算RMSE
+rmse = math.sqrt(np.mean(residuals ** 2))
+
+# 计算R^2
+r2 = r2_score(y_data, y_fit)
+
+# 绘制图形
+plt.figure(figsize=(8, 6))
+# 绘制观测数据点
+plt.scatter(x_data, y_data, label='Observed Data', marker='o', color='blue')
+# 绘制拟合曲线
+plt.plot(x_data, y_fit, label='Least Squares Fit', color='red')
+
+# 绘制残差
+for i in range(len(x_data)):
+    plt.plot([x_data[i], x_data[i]], [y_data[i], y_fit[i]], color='gray', linestyle='--')
+
+# 添加文本信息
+plt.text(6, 3, r'$R^2 = {:.2f}$'.format(r2), fontsize=12)
+plt.text(6, 2, r'$RMSE = {:.2f}$'.format(rmse), fontsize=12)
+
+plt.xlabel('Independent Variable (x)', fontsize=12)
+plt.ylabel('Dependent Variable (y)', fontsize=12)
+plt.title('Least Squares Fit with Residuals', fontsize=14)
+plt.legend(fontsize=12)
+plt.grid(True)
+plt.show()
